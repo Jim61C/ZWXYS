@@ -6,3 +6,5 @@ enum {None, TACS1010, TBCS1010, TCCS1010, TCS1020, TCS2010, TCS2100, TCS3230, TC
 var ModuleLecture[6] = [LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211];
 var ModuleTutor[6][3];
 ModuleTutor[0][0] = 0;
+
+var Haha = Yeah;
