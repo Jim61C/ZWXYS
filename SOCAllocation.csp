@@ -5,6 +5,7 @@ var GraduateCorse[6] = [false, false, false, false, false, true];
 enum {LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211};
 enum {None, TACS1010, TBCS1010, TCCS1010, TCS1020, TCS2010, TCS2100, TCS3230, TCS4211};
 var ModuleLecture[6] = [LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211];
+<<<<<<< HEAD
 var <List> ModuleTutor_CS1010;
 var <List> ModuleTutor_CS1020;
 var <List> ModuleTutor_CS2010;
@@ -18,3 +19,9 @@ var <List> ModuleTutor_List;
 
 Initialize =atomic{add_module{ ModuleTutor_List.Add(1)} ->add_module{ ModuleTutor_List.Add(2)}->Skip};
 
+=======
+var ModuleTutor[6][3];
+ModuleTutor[0][0] = 0;
+
+var Haha = Yeah;
+>>>>>>> 0db4c76540ecaddb343b9f6420ed0850db6e0c14
