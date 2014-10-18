@@ -1,0 +1,5 @@
+﻿#import "PAT.List";
+#import "Z:\ZWXYS.Module";
+var number = 5;
+SetTime = checktime->SetTime;
+var<Module> mod1 = new Module(1,1,false,1);
