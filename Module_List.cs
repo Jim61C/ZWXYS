@@ -24,6 +24,7 @@ namespace PAT.Lib
     
      public class TA : ExpressionValue 
     {
+
         public int index;
         public int[] modules;
         public int[] timeSlot = new int[10];
@@ -49,14 +50,19 @@ namespace PAT.Lib
             get {return ""; }
         }
 
-        public TA()
+
+         public TA()
         {
-            this.index =0;
         }
+
         public TA(int i, int[] mods)
         {
             index = i;
             modules = mods;
+        }
+
+        public void setIndex(int i){
+            index = i;
         }
 
         public int getIndex()
@@ -74,6 +80,10 @@ namespace PAT.Lib
             return timeSlot;
         }
 
+        public void setModules(int[] m){
+            modules = m;
+        }
+
         public int[] getModules()
         {
             return modules;
@@ -82,47 +92,11 @@ namespace PAT.Lib
 
     public class Module : ExpressionValue 
     {
-
+        public int classSize;
         public int ta;
         public bool gradClass;
         public int tutLen; // length of tutorial eg. 3 if tutorial takes up 3 timeslots
         public int assignedSlot;
-        public int classSize = 0;
-                
-        public override string ToString()
-        {
-            return "[" + ExpressionID +"]";
-        }
-        /// <summary>
-        /// Please implement this method to return a deep clone of the current object
-        /// </summary>
-        /// <returns></returns>
-        public override ExpressionValue GetClone()
-        {
-            return this;
-        }
-        /// <summary>
-        /// Please implement this method to provide the compact string representation of the datatype
-        /// </summary>
-        /// <returns></returns>
-        public override string ExpressionID
-        {
-            get
-            {
-                String returnString = "";
-                returnString += "Module_assignedSlot =" + assignedSlot;
-                return returnString;
-            }
-        }
-
-        public Module ()
-        {
-            this.classSize=0;
-            this.ta =0;
-            this.gradClass=false;
-            this.tutLen=0;
-            this.assignedSlot=0;
-        }
 
         public Module(int classSize, int ta, bool gradClass, int tutLen)
         {
@@ -131,6 +105,10 @@ namespace PAT.Lib
             this.gradClass = gradClass;
             this.tutLen = tutLen;
             this.assignedSlot = 0;
+        }
+        public Module()
+        {
+
         }
 
         // getters
@@ -165,6 +143,26 @@ namespace PAT.Lib
             assignedSlot = startSlot;
         }
 
+        public override string ToString()
+        {
+            return "[" + ExpressionID +"]";
+        }
+
+
+        public override ExpressionValue GetClone()
+        {
+            return this;
+        }
+
+        public override string ExpressionID
+        {
+            get
+            {
+                String returnString = "";
+                returnString += "Module_assignedSlot =" + assignedSlot;
+                return returnString;
+            }
+        }
 
     }
 
@@ -322,4 +320,4 @@ namespace PAT.Lib
 
   
     }
-}
+  }
