@@ -106,34 +106,8 @@ namespace PAT.Lib
         public int tutLen; // length of tutorial eg. 3 if tutorial takes up 3 timeslots
         public int assignedSlot;
         
-        public override string ToString()
-        {
-            return "";
-        }
-        /// <summary>
-        /// Please implement this method to return a deep clone of the current object
-        /// </summary>
-        /// <returns></returns>
-        public override ExpressionValue GetClone()
-        {
-            return this;
-        }
-        /// <summary>
-        /// Please implement this method to provide the compact string representation of the datatype
-        /// </summary>
-        /// <returns></returns>
-        public override string ExpressionID
-        {
-            get {return ""; }
-        }
-
         public Module ()
         {
-            this.classSize=0;
-            this.ta =0;
-            this.gradClass=false;
-            this.tutLen=0;
-            this.assignedSlot=0;
         }
 
         public Module(int classSize, int ta, bool gradClass, int tutLen)
@@ -176,6 +150,29 @@ namespace PAT.Lib
         {
             assignedSlot = startSlot;
         }
+        
+        public override string ToString()
+        {
+            return "";
+        }
+        /// <summary>
+        /// Please implement this method to return a deep clone of the current object
+        /// </summary>
+        /// <returns></returns>
+        public override ExpressionValue GetClone()
+        {
+            return this;
+        }
+        /// <summary>
+        /// Please implement this method to provide the compact string representation of the datatype
+        /// </summary>
+        /// <returns></returns>
+        public override string ExpressionID
+        {
+            get {return ""; }
+        }
+
+        
 
 
     }
