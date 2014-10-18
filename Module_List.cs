@@ -72,6 +72,9 @@ namespace PAT.Lib
 
         public TA()
         {
+            name = 0;
+            modules_size =0;
+            timeSlot_size =0;
         }
 
         public TA(int i, int[] mods)
@@ -118,6 +121,7 @@ namespace PAT.Lib
         public int assignedSlot;
         public int assignedRoom;// represented by enum
         public TA prof; 
+        public int TA_size = 0;
 
         public Module(int classSize, TA [] ta, bool gradClass, int tutLen)
         {
@@ -129,7 +133,13 @@ namespace PAT.Lib
         }
         public Module()
         {
-
+            TA_size = 0;
+            gradClass=false;
+            tutLen = 0;
+            assignedSlot =0;
+            assignedRoom =0;
+            prof = new TA();
+            classSize =0;
         }
 
         // getters
@@ -180,7 +190,19 @@ namespace PAT.Lib
             get
             {
                 String returnString = "";
-                returnString += "Module_assignedSlot =" + assignedSlot;
+                returnString += "classSize: "+ classSize +",";
+                returnString += "isGradClass: "+ gradClass +",";
+                returnString += "assignedSlot: "+ assignedSlot+ ",";
+                returnString += "assignedRoom: "+ assignedRoom+ ",";
+                returnString += "LengthOfTut: "+ tutLen+ ",";
+                returnString += "Professor: " + prof.ToString() +", ";
+                returnString += "TAs: "+"\n"+ "[ ";
+                for (int i=0;i< TA_size;i++)
+                {
+                    returnString += ta[i].ToString() +"\n";
+                }
+
+                returnString +="]" +"\n";
                 return returnString;
             }
         }
@@ -190,35 +212,32 @@ namespace PAT.Lib
    public class ModuleList : ExpressionValue 
     {
         public List <Module> list;
-
-        public int Field = 0;
+        public int size = 0;
         
         public override string ToString()
         {
-            return "";
+            return "[" + ExpressionID +"]";
         }
-        /// <summary>
-        /// Please implement this method to return a deep clone of the current object
-        /// </summary>
-        /// <returns></returns>
+
         public override ExpressionValue GetClone()
         {
             return this;
         }
-        /// <summary>
-        /// Please implement this method to provide the compact string representation of the datatype
-        /// </summary>
-        /// <returns></returns>
+
         public override string ExpressionID
         {
-            get {return ""; }
+            get
+            {
+                String  returnString = "ListOfModules: "+"\n"+ "[ ";
+                for(int i=0; i< size; i++)
+                {
+                    returnString+= list[i].ToString() +"\n";
+                }
+                returnString+="] "+"\n";
+                return returnString;
+            }
         }
 
-        public int Property
-        {
-            get { return Field; }
-            set { Field = value; }
-        }
 
         //default constructor
         public ModuleList()
