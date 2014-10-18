@@ -27,36 +27,19 @@ namespace PAT.Lib
         int index;
         int[] modules;
         int[] timeSlot = new int[10];
-        
-        public override string ToString()
+
+         public TA()
         {
-            return "";
-        }
-        /// <summary>
-        /// Please implement this method to return a deep clone of the current object
-        /// </summary>
-        /// <returns></returns>
-        public override ExpressionValue GetClone()
-        {
-            return this;
-        }
-        /// <summary>
-        /// Please implement this method to provide the compact string representation of the datatype
-        /// </summary>
-        /// <returns></returns>
-        public override string ExpressionID
-        {
-            get {return ""; }
         }
 
-        public TA()
-        {
-            this.index =0;
-        }
         public TA(int i, int[] mods)
         {
             index = i;
             modules = mods;
+        }
+
+        public void setIndex(int i){
+            index = i;
         }
 
         public int getIndex()
@@ -74,10 +57,45 @@ namespace PAT.Lib
             return timeSlot;
         }
 
+        public void setModules(int[] m){
+            modules = m;
+        }
+
         public int[] getModules()
         {
             return modules;
         }
+
+
+        /// <summary>
+        /// Please implement this method to provide the string representation of the datatype
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "";
+        }
+
+
+        /// <summary>
+        /// Please implement this method to return a deep clone of the current object
+        /// </summary>
+        /// <returns></returns>
+        public override ExpressionValue GetClone()
+        {
+            return this;
+        }
+
+
+        /// <summary>
+        /// Please implement this method to provide the compact string representation of the datatype
+        /// </summary>
+        /// <returns></returns>
+        public override string ExpressionID
+        {
+            get {return ""; }
+        }
+        
     }
 
     public class Module : ExpressionValue 
