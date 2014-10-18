@@ -25,49 +25,68 @@ namespace PAT.Lib
      public class TA : ExpressionValue 
     {
 
-        public int index;
+        public int name;
         public int[] modules;
-        public int[] timeSlot = new int[10];
+        public int modules_size;
+        public int[] timeSlot;
+        public int timeSlot_size;
         
         public override string ToString()
         {
-            return "";
+            return "[" + ExpressionID+ "]";
         }
-        /// <summary>
-        /// Please implement this method to return a deep clone of the current object
-        /// </summary>
-        /// <returns></returns>
+
         public override ExpressionValue GetClone()
         {
             return this;
         }
-        /// <summary>
-        /// Please implement this method to provide the compact string representation of the datatype
-        /// </summary>
-        /// <returns></returns>
+
         public override string ExpressionID
         {
-            get {return ""; }
+            get
+            {
+                String returnString = "";
+                returnString += "Name: " + this.name +", Modules: [";
+                for (int i=0;i< modules_size;i++)// print list of modules of the TA
+                {
+                    if(i == 0 )
+                    returnString += modules[i];
+                    else
+                    returnString += "," + modules[i];
+                } 
+                returnString +="]";
+                returnString += ", timeSlot: [";
+                for (int i=0;i< timeSlot_size;i++)// print list of timeslots of the TA
+                {
+                    if(i == 0 )
+                    returnString += timeSlot[i];
+                    else
+                    returnString += "," + timeSlot[i];
+                } 
+                returnString +="] ";
+
+                return returnString; 
+            }
         }
 
 
-         public TA()
+        public TA()
         {
         }
 
         public TA(int i, int[] mods)
         {
-            index = i;
+            name = i;
             modules = mods;
         }
 
         public void setIndex(int i){
-            index = i;
+            name = i;
         }
 
         public int getIndex()
         {
-            return index;
+            return name;
         }
 
         public void setTimeSlot(int i, int modIndex)
@@ -93,12 +112,14 @@ namespace PAT.Lib
     public class Module : ExpressionValue 
     {
         public int classSize;
-        public int ta;
+        public TA [] ta;
         public bool gradClass;
         public int tutLen; // length of tutorial eg. 3 if tutorial takes up 3 timeslots
         public int assignedSlot;
+        public int assignedRoom;// represented by enum
+        public TA prof; 
 
-        public Module(int classSize, int ta, bool gradClass, int tutLen)
+        public Module(int classSize, TA [] ta, bool gradClass, int tutLen)
         {
             this.classSize = classSize;
             this.ta = ta;
@@ -132,7 +153,7 @@ namespace PAT.Lib
             return assignedSlot;
         }
 
-        public int getTa()
+        public TA [] getTa()
         {
             return ta;
         }

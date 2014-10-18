@@ -21,5 +21,7 @@ var <TA> TA1;
 
 //process of initialize an array
 
-Initialize =atomic{add_module{ Module_list.Add(new Module(1,1,true,1))} ->add_module{ Module_list.Add ( new Module(0,0,false,0))}->Skip};
+Initialize =atomic{add_module{ Module_list.Add(new Module())} ->add_module{ Module_list.Add ( new Module())}->Skip};
+
+
 
