@@ -24,9 +24,9 @@ namespace PAT.Lib
     
      public class TA : ExpressionValue 
     {
-        int index;
-        int[] modules;
-        int[] timeSlot = new int[10];
+        public int index;
+        public int[] modules;
+        public int[] timeSlot = new int[10];
         
         public override string ToString()
         {
@@ -82,15 +82,16 @@ namespace PAT.Lib
 
     public class Module : ExpressionValue 
     {
-        public int classSize;
+
         public int ta;
         public bool gradClass;
         public int tutLen; // length of tutorial eg. 3 if tutorial takes up 3 timeslots
         public int assignedSlot;
-        
+        public int classSize = 0;
+                
         public override string ToString()
         {
-            return "";
+            return "[" + ExpressionID +"]";
         }
         /// <summary>
         /// Please implement this method to return a deep clone of the current object
@@ -106,7 +107,12 @@ namespace PAT.Lib
         /// <returns></returns>
         public override string ExpressionID
         {
-            get {return ""; }
+            get
+            {
+                String returnString = "";
+                returnString += "Module_assignedSlot =" + assignedSlot;
+                return returnString;
+            }
         }
 
         public Module ()
