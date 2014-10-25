@@ -1,6 +1,4 @@
-﻿
-
-enum {dummy_mod, CS1010, CS1020, CS2010, CS2100, CS3230, CS4211};
+﻿enum {dummy_mod, CS1010, CS1020, CS2010, CS2100, CS3230, CS4211};
 enum {dummy_L, LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211};	//Lecturer
 enum {dummy_TA, TA1CS1010, TA1CS1020, TA1CS2010, TA1CS2100, TA1CS3230, TA1CS4211};	//TA
 enum {dummy_LT, LT1, LT2};	//lecture venue
@@ -34,7 +32,6 @@ var LT_size[numOfLTs+1] = [dummy_LT,100,250];
 var lecturer_avail[numOfLecturers+1][numOfTimeslots+1];
 var TA_avail[numOfTAs+1][numOfTimeslots+1];
 
-<<<<<<< HEAD
 // venue available slots [venue_idx,slot_idx] = bool
 var LT_Timetable[numOfLTs+1][numOfTimeslots+1];
 var TR_Timetable[numOfTRs+1][numOfTimeslots+1];
@@ -66,18 +63,6 @@ AllocateLecture = (|||i:{1..numOfModules}@(|||j:{1..numOfLTs}@(|||k:{1..numOfTim
 
 //#assert AllocateLecture reaches allLecturesAllocated;
 //#assert FinalAllocate reaches allTutorialsAllocated;
-=======
-// venue available slots [venue_idx,slot_idx] = 0 for avail, 1 for taken
-var LT_avail[numOfLT+1][numOfTimeslot+1];
-var TR_avail[numOfTR+1][numOfTimeslot+1];
-
-//process of initialize an array
-Initialize =atomic{add_module{ Module_list.Add(new Module())} ->add_module{ Module_list.Add ( new Module())}->Skip};
-
-
-
-
->>>>>>> 3eaa56575ed1c8429a2c65b74b8096c242d8b18d
 
 
 
