@@ -17,11 +17,10 @@ var <ModuleList> Module_list;
 //var <ModuleList> t3;
 //var <ModuleList> t4;
 var <Module> Module1;
-var <TA> TA1;
+var <TA> TA1; 
 
 //process of initialize an array
 
 Initialize =atomic{add_module{ Module_list.Add(new Module())} ->add_module{ Module_list.Add ( new Module())}->Skip};
-
 
 
