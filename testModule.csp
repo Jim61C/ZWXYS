@@ -5,7 +5,8 @@ enum {dummy_L, LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211};	//Lecturer
 enum {dummy_TA, TA1CS1010, TA1CS1020, TA1CS2010, TA1CS2100, TA1CS3230, TA1CS4211};	//TA
 enum {dummy_LT, LT1, LT2};	//lecture venue
 enum {dummy_TR, TR1,TR2,TR3};	//tutorial venue
-enum {dummy_t, t0800,t0830,t0900,t0930,t1000,t1030,t1100,t1130,t1200,t1230,t1300,t1330,t1400,t1430,t1500,t1530,t1600,t1630,t1700,t1730,t1800,t1830,t1900,t1930}; //starting timeslots
+//enum {dummy_t, t0800,t0830,t0900,t0930,t1000,t1030,t1100,t1130,t1200,t1230,t1300,t1330,t1400,t1430,t1500,t1530,t1600,t1630,t1700,t1730,t1800,t1830,t1900,t1930}; //starting timeslots
+enum {dummy_t, t0800,t0830,t0900,t0930,t1000,t1030,t1100,t1130,t1200,t1230,t1300,t1330}; //starting timeslots
 enum {dummy_day, Mon, Tue, Wed, Thu, Fri};
 
 #define numOfModules 2;
@@ -28,10 +29,12 @@ var TAs[numOfTAs+1] = [dummy_TA, TA1CS1010, TA1CS1020, TA1CS2010, TA1CS2100, TA1
 var TR_size[numOfTRs+1] = [dummy_TR,250,100,100];
 var LT_size[numOfLTs+1] = [dummy_LT,100,250];
 
+
 // staff available slots [lecturer_idx,slot_idx] = 0 for avail, 1 for taken
 var lecturer_avail[numOfLecturers+1][numOfTimeslots+1];
 var TA_avail[numOfTAs+1][numOfTimeslots+1];
 
+<<<<<<< HEAD
 // venue available slots [venue_idx,slot_idx] = bool
 var LT_Timetable[numOfLTs+1][numOfTimeslots+1];
 var TR_Timetable[numOfTRs+1][numOfTimeslots+1];
@@ -63,6 +66,18 @@ AllocateLecture = (|||i:{1..numOfModules}@(|||j:{1..numOfLTs}@(|||k:{1..numOfTim
 
 //#assert AllocateLecture reaches allLecturesAllocated;
 //#assert FinalAllocate reaches allTutorialsAllocated;
+=======
+// venue available slots [venue_idx,slot_idx] = 0 for avail, 1 for taken
+var LT_avail[numOfLT+1][numOfTimeslot+1];
+var TR_avail[numOfTR+1][numOfTimeslot+1];
+
+//process of initialize an array
+Initialize =atomic{add_module{ Module_list.Add(new Module())} ->add_module{ Module_list.Add ( new Module())}->Skip};
+
+
+
+
+>>>>>>> 3eaa56575ed1c8429a2c65b74b8096c242d8b18d
 
 
 

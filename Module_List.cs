@@ -229,7 +229,7 @@ namespace PAT.Lib
             get
             {
                 String  returnString = "ListOfModules: "+"\n"+ "[ ";
-                for(int i=0; i< size; i++)
+                for(int i=0; i< this.size; i++)
                 {
                     returnString+= list[i].ToString() +"\n";
                 }
@@ -300,6 +300,7 @@ namespace PAT.Lib
 	    public void Add(Module element)
         {
            this.list.Add(element);
+           this.size++;
         }
 
         public Module Get(int index)
@@ -341,6 +342,7 @@ namespace PAT.Lib
         public void Remove(Module element)
         {
             this.list.Remove(element);
+            this.size--;
         }
         
         public void RemoveAt(int index)
@@ -348,6 +350,7 @@ namespace PAT.Lib
             if (index >= 0 && index <= list.Count)
             {
                 this.list.RemoveAt(index);
+                this.size--;
             }
             else
             {
