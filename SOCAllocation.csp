@@ -23,5 +23,7 @@ var <TA> TA1;
 
 Initialize =atomic{add_module{ Module_list.Add(new Module())} ->add_module{ Module_list.Add ( new Module())}->Skip};
 
+Allocate = 
+
 
 
