@@ -1,5 +1,50 @@
 ﻿#import "PAT.List";
-#import "Z:\ZWXYS.Module";
-var number = 5;
-SetTime = checktime->SetTime;
-var<Module> mod1 = new Module(1,1,false,1);
+#import "Module_List";
+
+enum {none, CS1010, CS1020, CS2010, CS2100, CS3230, CS4211};
+var ModuleSize[6] = [168, 159, 155, 153, 142, 84];
+//var GraduateCourse[6] = [false, false, false, false, false, true];
+enum {LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211};	//Lecturer
+enum {None, TA1CS1010, TA1CS1020, TA1CS2010, TA1CS2100, TA1CS3230, TA1CS4211};	//TA
+enum {LT19, LT15}	//lecture venue
+enum {TR1,TR2,TR3}	//tutorial venue
+enum {t0800,t0830,t0900,t0930,t1000,t1030,t1100,t1130,t1200,t1230,t1300,t1330,t1400,t1430,t1500,t1530,t1600,t1630,t1700,t1730,t1800,t1830,t1900,t1930,t2000,t2030} //starting timeslots
+enum {Mon, Tue, Wed, Thu, Fri}
+var ModuleLecturer[6] = [LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211];
+//var <List> ModuleTutor_CS1010;
+//var <List> ModuleTutor_CS1020;
+//var <List> ModuleTutor_CS2010;
+//var <List> ModuleTutor_CS2100;
+//var <List> ModuleTutor_CS3230;
+var <List> PAT_List;
+var <ModuleList> Module_list;
+//var <ModuleList> t3;
+//var <ModuleList> t4;
+var <Module> Module1;
+var <TA> TA1;
+var lecture_duration[] = [4,4,4,4,4,5]
+var tuturial_duration[] = [2,2,2,2,2,2]
+
+// _size[venue_idx] = int
+var module_size[] = [200,120,50,]
+var tutorial_size[] =
+var TR_size[] = []
+var LT_size[] = []
+
+// staff available slots [lecturer_idx,slot_idx] = bool
+var lecturer_avail[][] =
+var ta_avail[][] =  
+// venue available slots [venue_idx,slot_idx] = bool
+var LT_avail[][] =
+var TR_avail[][] =
+
+//process of initialize an array
+
+Initialize =atomic{add_module{ Module_list.Add(new Module())} ->add_module{ Module_list.Add ( new Module())}->Skip};
+var<Module> CS1234 = new Module(1,2,false,1); 
+var c = Module_List.Count();
+
+
+
+
+
