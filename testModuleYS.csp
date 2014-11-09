@@ -1,0 +1,87 @@
+﻿enum {dummy_mod, CS1010, CS1020, CS2010, CS2100, CS3230, CS4211};
+enum {dummy_L, LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211};	//Lecturer
+enum {dummy_TA, TA1CS1010, TA1CS1020, TA1CS2010, TA1CS2100, TA1CS3230, TA1CS4211};	//TA
+enum {dummy_LT, LT1, LT2};	//lecture venue
+enum {dummy_TR, TR1,TR2,TR3};	//tutorial venue
+//enum {dummy_t, t0800,t0830,t0900,t0930,t1000,t1030,t1100,t1130,t1200,t1230,t1300,t1330,t1400,t1430,t1500,t1530,t1600,t1630,t1700,t1730,t1800,t1830,t1900,t1930}; //starting timeslots
+enum {dummy_t, t0800,t0830,t0900,t0930,t1000,t1030,t1100,t1130,t1200,t1230,t1300,t1330}; //starting timeslots
+enum {dummy_day, Mon, Tue, Wed, Thu, Fri};
+
+#define numOfModules 6;
+#define numOfTutorials 6;
+#define numOfTimeslots 3; 
+#define numOfTAs 6;
+#define numOfLecturers 6;
+#define numOfLTs 2;
+#define numOfTRs 3;
+#define available 0;
+
+var lecturers[numOfLecturers+1] = [dummy_L, LCS1010, LCS1020, LCS2010, LCS2100, LCS3230, LCS4211];
+var TAs[numOfTAs+1] = [dummy_TA, TA1CS1010, TA1CS1020, TA1CS2010, TA1CS2100, TA1CS3230, TA1CS4211];
+var lecture_duration[numOfModules+1] = [dummy_mod,4,4,4,4,4,5];
+var tutorial_duration[numOfModules+1] = [dummy_mod,2,2,2,2,2,2];
+
+// _size[venue_idx] = int
+var module_size[numOfModules+1] = [dummy_mod,200,120,100, 120, 80,85];
+//var tutorial_size[numOfTutorials+1] = [dummy_mod,200,120,100, 120, 80, 85]; // same as module size for now
+var TR_size[numOfTRs+1] = [dummy_TR,250,100,100];
+var LT_size[numOfLTs+1] = [dummy_LT,100,250];
+
+
+// staff available slots [lecturer_idx,slot_idx] = 0 for avail, 1 for taken
+var lecturer_avail[numOfLecturers+1][numOfTimeslots+1];
+var TA_avail[numOfTAs+1][numOfTimeslots+1];
+
+// venue available slots [venue_idx,slot_idx] = bool
+var LT_Timetable[numOfLTs+1][numOfTimeslots+1];
+var TR_Timetable[numOfTRs+1][numOfTimeslots+1];
+var lecture_time_is_allocated[numOfModules+1];
+var lecture_venue_is_allocated[numOfModules+1];
+var lecture_staff_is_allocated[numOfModules+1];
+var lecture_space_utilization[numOfModules+1];
+var tutorial_time_is_allocated[numOfTutorials+1];
+var tutorial_venue_is_allocated[numOfTutorials+1];
+var tutorial_staff_is_allocated[numOfTutorials+1];
+
+// i is the module code, j is the LT code, K is the timeslot code
+
+allocateLectureClass(i,j,k) = [lecture_time_is_allocated[i]==0 && lecture_venue_is_allocated[i]==0 && LT_Timetable[j][k]==available && LT_Timetable[j][k+1]==available && module_size[i] <= LT_size[j] ]
+								allocate.i{
+									lecture_time_is_allocated[i]=i; //time is allocated
+									lecture_venue_is_allocated[i]=i;
+									lecture_space_utilization[i] = module_size[i] / LT_size[j];
+									LT_Timetable[j][k]=i;
+									LT_Timetable[j][k+1]=i;
+									var x=1;
+								}
+							->Skip;
+allocateLectureStaff(i,j,k) = [lecture_staff_is_allocated[i]==0]allocate.i{var x = 1;} -> allocateLectureStaff(i,j,k);
+
+AllocateLecture() = (|||i:{1..numOfModules}@(|||j:{1..numOfLTs}@(|||k:{1..numOfTimeslots-1}@(allocateLectureClass(i,j,k)[]allocateLectureStaff(i,j,k)))));
+//AllocateTutorial = (|||i:{1..numOfTutorial}@(allocateTutorialClass(i)[]allocateTutorialStaff(i)));
+//AllocateTutorial = (|||i:{1..numOfTutorial},j:{1..numOfTR},k:{1..numOfTimeslot}@(allocateTutorialClass(i,j,k)[]allocateTutorialStaff(i,j,k)));
+var allLecturesAllocated = 0;
+
+checkAllLecturesAllocated() = findmax{ 
+                var index = 1; 
+                while (index < numOfModules + 1) { 
+                        if (lecture_venue_is_allocated[index] != 0) { 
+                            allLecturesAllocated = allLecturesAllocated + 1 ; // lecture[index] is allocated
+                        } 
+                        index = index+1;
+                };
+        } -> checkAllLecturesAllocated();
+        
+P() = AllocateLecture(); checkAllLecturesAllocated();
+
+#assert P() deadlockfree;
+
+#define lecturesAllocated (allLecturesAllocated == numOfModules);
+#assert P() reaches lecturesAllocated;
+
+
+//#assert FinalAllocate reaches allTutorialsAllocated;
+
+
+
+
