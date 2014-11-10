@@ -193,18 +193,19 @@ P() =  AllocateLecture()|||[lecture_venue_is_allocated[1]!=0 && lecture_venue_is
 
 // this is checking that if we are checking an LT average and UT rate, it always implies that all the lectures have been allocated already. 
 #define LTUTandAverageChecked checkedLTAvg == true && checkedLTUT == true;	
-#assert P() |= <>(LTUTandAverageChecked -> lecturesAllocated);
+#assert P() |= [](LTUTandAverageChecked -> lecturesAllocated);
 
-#define TRUTandAverageChecked checkedTRAvg == true && checkedTRUT == true;
-#assert P() |= <>(TRUTandAverageChecked -> tutorialsAllocated);
+#define ScheduleUTandAverageChecked checkedTRAvg == true && checkedTRUT == true;
+#assert P() |= [](ScheduleUTandAverageChecked -> tutorialsAllocated);
+#assert P() |= [](ScheduleUTandAverageChecked -> lecturesAllocated);
 
 //this ensures that if a non clashing schedule can be generated, it implies that an optimal schedule is possible.
 #define optimalSchedule minDifferenceTR!=infinity && tutorialUtilization!=empty && minDifference!=infinity && lectureUtilization!=empty;
 #assert P() |= <>(noClash -> optimalSchedule);
 
-// once an optimal schedule has been generated, all the lectures and tutorials of all modules should have been allocated with a room
-#define incompleteSchedule tutorial_venue_is_allocated[1]==0 || tutorial_venue_is_allocated[2]==0 || tutorial_venue_is_allocated[3]==0 || lecture_venue_is_allocated[1]==0 || lecture_venue_is_allocated[2]==0 || lecture_venue_is_allocated[3]==0;
-#assert P() |= [](TRUTandAverageChecked -> !(incompleteSchedule));
+// Check utilization rate and usage distribution of every completed schedule
+#define completeSchedule tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 && tutorial_venue_is_allocated[3]!=0 && lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0;
+#assert P() |= <>(completeSchedule->ScheduleUTandAverageChecked);
 
 
 
