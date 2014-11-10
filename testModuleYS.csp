@@ -8,47 +8,54 @@ enum {dummy_t, t0800,t0830,t0900,t0930,t1000,t1030,t1100,t1130,t1200,t1230,t1300
 enum {dummy_day, Mon, Tue, Wed, Thu, Fri};
 
 #define numOfModules 3;
-#define numOfTutorials 6;
-#define numOfTimeslots 3; 
-#define numOfTAs 6;
-#define numOfLecturers 2;
+#define numOfTutorials 3;
+#define numOfLTTimeslots 3; 
+#define numOfTRTimeslots 2; 
+//#define numOfTAs 6;
+//#define numOfLecturers 2;
 #define numOfLTs 2;
-#define numOfTRs 3;
+#define numOfTRs 2;
 #define available 0;
 
 
 //var TAs[numOfTAs+1] = [dummy_TA, TA1CS1010, TA1CS1020, TA1CS2010, TA1CS2100, TA1CS3230, TA1CS4211];
-var lecture_duration[numOfModules+1] = [dummy_mod,4,4,4]; //[dummy_mod,4,4,4,4,4,5];
-var tutorial_duration[numOfModules+1] = [dummy_mod,2,2,2]; //[dummy_mod,2,2,2,2,2,2];
+//var lecture_duration[numOfModules+1] = [dummy_mod,4,4,4]; //[dummy_mod,4,4,4,4,4,5];
+//var tutorial_duration[numOfModules+1] = [dummy_mod,2,2,2]; //[dummy_mod,2,2,2,2,2,2];
 
 // _size[venue_idx] = int
 var module_size[numOfModules+1] = [dummy_mod, 200, 120,100]; //[dummy_mod,200,120,100, 120, 80,85];
-//var tutorial_size[numOfTutorials+1] = [dummy_mod,200,120,100, 120, 80, 85]; // same as module size for now
-var TR_size[numOfTRs+1] = [dummy_TR,250,100,100];
+var tutorial_size[numOfTutorials+1] = [dummy_mod,200,120,100]; // same as module size for now
+var TR_size[numOfTRs+1] = [dummy_TR,250,100];
 var LT_size[numOfLTs+1] = [dummy_LT,100,250];
 
 
 // staff available slots [lecturer_idx,slot_idx] = 0 for avail, 1 for taken
-var lecturer_avail[numOfLecturers+1][numOfTimeslots+1];
-var TA_avail[numOfTAs+1][numOfTimeslots+1];
+//var lecturer_avail[numOfLecturers+1][numOfTimeslots+1];
+//var TA_avail[numOfTAs+1][numOfTimeslots+1];
 
 // venue available slots [venue_idx,slot_idx] = bool
-var LT_Timetable[numOfLTs+1][numOfTimeslots+1];
-var TR_Timetable[numOfTRs+1][numOfTimeslots+1];
+var LT_Timetable[numOfLTs+1][numOfLTTimeslots+1];
+var TR_Timetable[numOfTRs+1][numOfTRTimeslots+1];
 var lecture_time_is_allocated[numOfModules+1];
 var lecture_venue_is_allocated[numOfModules+1];
-var lecture_staff_is_allocated[numOfModules+1];
+//var lecture_staff_is_allocated[numOfModules+1];
 var lecture_space_utilization[numOfModules+1];
 var lecture_times_used[numOfLTs+1];
 var tutorial_time_is_allocated[numOfTutorials+1];
 var tutorial_venue_is_allocated[numOfTutorials+1];
-var tutorial_staff_is_allocated[numOfTutorials+1];
+//var tutorial_staff_is_allocated[numOfTutorials+1];
+var tutorial_space_utilization[numOfTutorials+1];
+var tutorial_times_used[numOfTRs+1];
 
-var averageTimesLTUsed = numOfModules*100/numOfLTs;
+var averageTimesLTUsed = numOfModules*100/numOfLTs;		// variables which represent the optimal number of times a room should be used
+var averageTimesTRUsed = numOfTutorials*100/numOfTRs;
+
+var checkedLTUT = false;	// variables to control the number of states in the graph, to avoid endless checking of the UT rate and Average times used
+var checkedLTAvg = false;
 
 // i is the module code, j is the LT code, K is the timeslot code
 allocateLectureClass(i,j,k) = [lecture_time_is_allocated[i]==0 && lecture_venue_is_allocated[i]==0 && LT_Timetable[j][k]==available && module_size[i]<=LT_size[j] ] //&& LT_Timetable[j][k+1]==available
-								allocate.i.j.k{
+								LectureAllocate.i.j.k{
 									lecture_time_is_allocated[i]=k; //time is allocated
 									lecture_venue_is_allocated[i]=j;
 									lecture_space_utilization[i]=(module_size[i]*100)/LT_size[j];
@@ -56,18 +63,20 @@ allocateLectureClass(i,j,k) = [lecture_time_is_allocated[i]==0 && lecture_venue_
 									LT_Timetable[j][k]=i;
 									
 									//LT_Timetable[j][k+1]=i;
-									var x=1;
+									//var x=1;
+									checkedLTUT = false;	// to ensure that we check the UT and Avg later
+									checkedLTAvg = false
 								}
 							->allocateLectureClass((i+1)%3,j,k);
 //allocateLectureStaff(i,j,k) = [lecture_staff_is_allocated[i]==0]allocate.i{var x = 1;} -> allocateLectureStaff(i,j,k);
 
 
 
-var lectureUtilization = 0;
+var lectureUtilization = 0;		// intitalize average lecture UT Rate, the higher the UT rate the better
 
-var minDifference = 100000;
+var minDifference = 100000;		// intialize average LT times used, the smaller the difference between our schedule's average time used with the optimal the better
 
-addLectureUtilization() = { 
+addLectureUtilization() = LectureUt{ 
                 var index = 1; 
                 var totalUtilization = 0;
                 
@@ -78,10 +87,10 @@ addLectureUtilization() = {
                 if(totalUtilization > lectureUtilization){
                       lectureUtilization = totalUtilization;
                 };
-               
+                checkedLTUT = true;
         } -> Skip;
         
-checkTimesUsed()={
+checkTimesUsed()=LectureTimesUsed{
  				var i = 1;
  				var averageDifference = 0;
                 while (i < numOfLTs+1){
@@ -96,18 +105,77 @@ checkTimesUsed()={
                 if(minDifference > averageDifference){
                 	minDifference = averageDifference;
                 };
+                checkedLTAvg = true;
                 } -> Skip;
         
 		
-AllocateLecture() = (|||i:{1..numOfModules}@(|||j:{1..numOfLTs}@(|||k:{1..numOfTimeslots-1}@(allocateLectureClass(i,j,k)[][lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0]addLectureUtilization()[][lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0]checkTimesUsed()))));
+AllocateLecture() = (|||i:{1..numOfModules}@(|||j:{1..numOfLTs}@(|||k:{1..numOfLTTimeslots}@(allocateLectureClass(i,j,k)[][lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0 && checkedLTUT == false]addLectureUtilization()[][lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0 && checkedLTAvg==false]checkTimesUsed()))));
+
+var checkedTRUT = false;
+var checkedTRAvg = false;
+
+// i is the module code, j is the TRcode, K is the timeslot code
+allocateTutorialClass(i,j,k) = [lecture_time_is_allocated[i]!=0 && lecture_time_is_allocated[i]!=k && tutorial_time_is_allocated[i]==0 && tutorial_venue_is_allocated[i]==0 && TR_Timetable[j][k]==available && module_size[i]<=TR_size[j] ] 
+								TutorialAllocate.i.j.k{
+									tutorial_time_is_allocated[i]=k; //time is allocated
+									tutorial_venue_is_allocated[i]=j;
+									tutorial_space_utilization[i]=(module_size[i]*100)/TR_size[j];
+									tutorial_times_used[j] = tutorial_times_used[j] + 100;
+									TR_Timetable[j][k]=i;
+									
+									//LT_Timetable[j][k+1]=i;
+									var x=1;
+									
+									checkedTRUT = false;
+									checkedTRAvg = false;
+									
+								}
+							->allocateTutorialClass((i+1)%3,j,k);
+							
+var tutorialUtilization = 0;
+
+var minDifferenceTR = 100000;
+
+addTutorialUtilization() = TutorialUT{ 
+                var index = 1; 
+                var totalUtilization = 0;
+                
+                while (index < numOfTutorials+1) { 
+                        totalUtilization = totalUtilization + tutorial_space_utilization[index];
+                        index = index+1;
+                };
+                if(totalUtilization > tutorialUtilization){
+                      tutorialUtilization = totalUtilization;
+                };
+                checkedTRUT = true;
+               
+        } -> Skip;
         
-
-
+checkTRTimesUsed()=TRUsed{
+ 				var i = 1;
+ 				var averageDifference = 0;
+                while (i < numOfTRs+1){
+               		
+               		var d = tutorial_times_used[i] - averageTimesTRUsed;
+               		if(d<0){
+               			d = -d;
+               		}
+               		averageDifference = averageDifference + d;
+               		i = i+1;
+                };
+                if(minDifferenceTR > averageDifference){
+                	minDifferenceTR = averageDifference;
+                };
+                checkedTRAvg = true;
+                } -> Skip;
+                
+AllocateTutorial() = (|||i:{1..numOfTutorials}@(|||j:{1..numOfTRs}@(|||k:{1..numOfTRTimeslots}@(allocateTutorialClass(i,j,k)[][tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 && tutorial_venue_is_allocated[3]!=0 && checkedTRUT==false]addTutorialUtilization()[][tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 && tutorial_venue_is_allocated[3]!=0 && checkedTRAvg==false]checkTRTimesUsed()))));					
 //AllocateTutorial() = (|||i:{1..numOfTutorial}@(allocateTutorialClass(i)[]allocateTutorialStaff(i)));
 //AllocateTutorial = (|||i:{1..numOfTutorial},j:{1..numOfTR},k:{1..numOfTimeslot}@(allocateTutorialClass(i,j,k)[]allocateTutorialStaff(i,j,k)));
 
-        
-P() = AllocateLecture();
+
+// we only start assigning tutorials after we assigned the lectures, meaning lectures have priority over tutorials        
+P() =  AllocateLecture()|||[lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0&&checkedLTAvg==true&&checkedLTUT==true]AllocateTutorial();
 
 //#assert P() deadlockfree; our program should be able to assign a schedule which has deadlock to prove its worth
 
@@ -115,8 +183,13 @@ P() = AllocateLecture();
 #assert P() reaches lecturesAllocated with max(lectureUtilization);
 #assert P() reaches lecturesAllocated with min(minDifference);
 
-#assert P() divergencefree;
+#define tutorialsAllocated tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 && tutorial_venue_is_allocated[3]!=0;
+#assert P() reaches tutorialsAllocated with max(tutorialUtilization);
+#assert P() reaches tutorialsAllocated with min(minDifferenceTR);
 
+// check that a non deadlock schedule is possible given the number of rooms, lectures and tutorials
+#define noClash tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 && tutorial_venue_is_allocated[3]!=0 && lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0 && tutorial_time_is_allocated[1]!=lecture_time_is_allocated[1] && tutorial_time_is_allocated[2]!=lecture_time_is_allocated[2] && tutorial_time_is_allocated[3]!=lecture_time_is_allocated[3];
+#assert P() reaches noClash;
 //#assert FinalAllocate reaches allTutorialsAllocated;
 
 
