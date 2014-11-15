@@ -78,7 +78,7 @@ var lectureUtilization = empty;		// intitalize average lecture UT Rate, the high
 var usageDistributionDifferenceLT = infinity;		// intialize average LT times used, the smaller the difference between our schedule's average time used with the optimal the better
 var currentLTUT;
 var currentLTUsageDifference;
-addLectureUtilization() = LectureUt{ 
+addLectureUtilization() = UpdateLectureUtilization{ 
                 var index = 1; 
                 var totalUtilization = 0;
                 
@@ -93,7 +93,7 @@ addLectureUtilization() = LectureUt{
                 checkedLTUT = true;
         } -> Skip;
         
-checkTimesUsed()=LectureTimesUsed{
+checkTimesUsed()=UpdateLectureTimesUsed{
  				var i = 1;
  				var averageDifference = 0;
                 while (i < numOfLTs+1){
@@ -143,7 +143,7 @@ var usageDistributionDifferenceTR = infinity;
 var currentTRUT;
 var currentTRUsageDifference;
 
-addTutorialUtilization() = TutorialUT{ 
+addTutorialUtilization() = UpdateTutorialUtilization{ 
                 var index = 1; 
                 var totalUtilization = 0;
                 
@@ -159,7 +159,7 @@ addTutorialUtilization() = TutorialUT{
                
         } -> Skip;
         
-checkTRTimesUsed()=TRUsed{
+checkTRTimesUsed()=UpdateTutorialTimesUsed{
  				var i = 1;
  				var averageDifference = 0;
                 while (i < numOfTRs+1){
@@ -184,51 +184,51 @@ AllocateTutorial() = (|||i:{1..numOfTutorials}@(|||j:{1..numOfTRs}@(|||k:{1..num
 
 
 // we only start assigning tutorials after we assigned the lectures, meaning lectures have priority over tutorials        
-P() =  AllocateLecture()|||[lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0&&checkedLTAvg==true&&checkedLTUT==true]AllocateTutorial();
+P_AllocateAll() =  AllocateLecture()|||[lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0&&checkedLTAvg==true&&checkedLTUT==true]AllocateTutorial();
 
 // Assertions
 
-// no #assert P() deadlockfree; our program should be able to assign a schedule which has deadlock to show that resources need to be optimized
+// no #assert P_AllocateAll() deadlockfree; our program should be able to assign a schedule which has deadlock to show that resources need to be optimized
 
 // check that a non deadlock schedule is possible given the number of rooms, lectures and tutorials
 #define noClash tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 && tutorial_venue_is_allocated[3]!=0 && lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[3]!=0 && tutorial_time_is_allocated[1]!=lecture_time_is_allocated[1] && tutorial_time_is_allocated[2]!=lecture_time_is_allocated[2] && tutorial_time_is_allocated[3]!=lecture_time_is_allocated[3];
 // Experiment B: #define noClash tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 && lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 && /*lecture_venue_is_allocated[3]!=0 &&*/ tutorial_time_is_allocated[1]!=lecture_time_is_allocated[1] && tutorial_time_is_allocated[2]!=lecture_time_is_allocated[2];
-#assert P() reaches noClash;
+#assert P_AllocateAll() reaches noClash;
 
 //Experiment C: Determine if a schedule that has both the highest room utilization rate observed and the lowest room usage distribution difference observed can be attained
 #define optimalPossible currentLTUT==lectureUtilization && currentLTUsageDifference==usageDistributionDifferenceLT && currentTRUT==tutorialUtilization && currentTRUsageDifference==usageDistributionDifferenceTR ;
-#assert P() reaches optimalPossible;
+#assert P_AllocateAll() reaches optimalPossible;
 
 #define lecturesAllocated lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 /*&& lecture_venue_is_allocated[3]!=0*/;
-#assert P() reaches lecturesAllocated with max(lectureUtilization);
-#assert P() reaches lecturesAllocated with min(usageDistributionDifferenceLT);
+#assert P_AllocateAll() reaches lecturesAllocated with max(lectureUtilization);
+#assert P_AllocateAll() reaches lecturesAllocated with min(usageDistributionDifferenceLT);
 
 #define tutorialsAllocated tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 /*&& tutorial_venue_is_allocated[3]!=0*/;
-#assert P() reaches tutorialsAllocated with max(tutorialUtilization);
-#assert P() reaches tutorialsAllocated with min(usageDistributionDifferenceTR);
+#assert P_AllocateAll() reaches tutorialsAllocated with max(tutorialUtilization);
+#assert P_AllocateAll() reaches tutorialsAllocated with min(usageDistributionDifferenceTR);
 
 #define highestUT (tutorialUtilization+lectureUtilization)/(numOfModules+numOfTutorials);
-#assert P() reaches ScheduleUTandAverageChecked with max(highestUT);
+#assert P_AllocateAll() reaches ScheduleUTandAverageChecked with max(highestUT);
 
 #define lowestDistributionDifference (usageDistributionDifferenceLT+usageDistributionDifferenceTR)/(numOfLTs+numOfTRs);
-#assert P() reaches ScheduleUTandAverageChecked with min(lowestDistributionDifference);
+#assert P_AllocateAll() reaches ScheduleUTandAverageChecked with min(lowestDistributionDifference);
 
 
 // this is checking that if we are checking an LT average and UT rate, it always implies that all the lectures have been allocated already. 
 #define LTUTandAverageChecked checkedLTAvg == true && checkedLTUT == true;	
-#assert P() |= [](LTUTandAverageChecked -> lecturesAllocated);
+#assert P_AllocateAll() |= [](LTUTandAverageChecked -> lecturesAllocated);
 
 #define ScheduleUTandAverageChecked checkedTRAvg == true && checkedTRUT == true;
-#assert P() |= [](ScheduleUTandAverageChecked -> tutorialsAllocated);
-#assert P() |= [](ScheduleUTandAverageChecked -> lecturesAllocated);
+#assert P_AllocateAll() |= [](ScheduleUTandAverageChecked -> tutorialsAllocated);
+#assert P_AllocateAll() |= [](ScheduleUTandAverageChecked -> lecturesAllocated);
 
 //this ensures that if a non clashing schedule can be generated, it implies that an optimal schedule is possible.
 #define optimalSchedule usageDistributionDifferenceTR!=infinity && tutorialUtilization!=empty && usageDistributionDifferenceLT!=infinity && lectureUtilization!=empty;
-#assert P() |= <>(noClash -> optimalSchedule);
+#assert P_AllocateAll() |= <>(noClash -> optimalSchedule);
 
 // Check utilization rate and usage distribution of every completed schedule
 #define completeSchedule tutorial_venue_is_allocated[1]!=0 && tutorial_venue_is_allocated[2]!=0 /*&& tutorial_venue_is_allocated[3]!=0*/ && lecture_venue_is_allocated[1]!=0 && lecture_venue_is_allocated[2]!=0 /*&& lecture_venue_is_allocated[3]!=0*/;
-#assert P() |= <>(completeSchedule->ScheduleUTandAverageChecked);
+#assert P_AllocateAll() |= <>(completeSchedule->ScheduleUTandAverageChecked);
 
 
 
